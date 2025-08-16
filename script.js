@@ -2,11 +2,51 @@ const chatBody = document.querySelector(".chat-body");
 const messageInput = document.querySelector(".message-input");
 const sendMessageButton = document.querySelector("#send-message");
 
+const API_KEY = "AIzaSyAxIinPPyesnrzAkAQDgsH8HrDI9s9RrBw";
+const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
+
 const userData = {
     message: null
 }
 
-const createMessageElement = (content, ...classes) => {
+const generateBotResponse = async (botMessageDiv) => {
+    const messageTextElement = botMessageDiv.querySelector(".message-text");
+
+    const request = {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "x-goog-api-key": API_KEY,
+        },
+        body: JSON.stringify({
+            contents: [{
+                parts: [{
+                    text: userData.message,
+                }]
+            }]
+        })
+    }
+
+    try {
+        const response = await fetch(API_URL, request);
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.error.message);
+        }
+        
+        const apiResponseText = data.candidates[0].content.parts[0].text.replace(/\*\*(.*?)\*\*/g, "$1").trim();
+        messageTextElement.innerText = apiResponseText;
+    } catch (error) {
+        messageTextElement.innerText = "Sorry, some unknown error occured! I am unable to respond to your question at this moment.";
+        messageTextElement.style.color = "#ff0000"
+        console.log(error);
+    } finally {
+        botMessageDiv.classList.remove("thinking");
+        chatBody.scrollTo({ top: chatBody.scrollHeight, behavior: "smooth" })
+    }
+}
+
+const createMessageBoxElement = (content, ...classes) => {
     const div = document.createElement("div");
     div.classList.add("message", ...classes);
     div.innerHTML = content;
@@ -19,9 +59,10 @@ const handleOutgoingMessage = (e) => {
     messageInput.value = "";
     const messageContent = `<div class="message-text"></div>`;
 
-    const userMessageDiv = createMessageElement(messageContent, "user-message");
-    userMessageDiv.querySelector(".message-text").innerHTML = userData.message
+    const userMessageDiv = createMessageBoxElement(messageContent, "user-message");
+    userMessageDiv.querySelector(".message-text").innerText = userData.message
     chatBody.appendChild(userMessageDiv);
+    chatBody.scrollTo({ top: chatBody.scrollHeight, behavior: "smooth" })
 
     setTimeout(() => {
         const messageContent = `<svg class="bot-avatar" xmlns="http://www.w3.org/2000/svg" width="50" height="50"
@@ -38,8 +79,10 @@ const handleOutgoingMessage = (e) => {
                     </div>
                 </div>`;
 
-        const botThinkingMessageDiv = createMessageElement(messageContent, "bot-message", "thinking");
+        const botThinkingMessageDiv = createMessageBoxElement(messageContent, "bot-message", "thinking");
         chatBody.appendChild(botThinkingMessageDiv);
+        chatBody.scrollTo({ top: chatBody.scrollHeight, behavior: "smooth" })
+        generateBotResponse(botThinkingMessageDiv);
     }, 200);
 }
 
