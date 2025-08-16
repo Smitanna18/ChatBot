@@ -164,4 +164,68 @@ body {
 /* ChatBot - FOOTER */
 .chat-footer {
     position: absolute;
+    bottom: 0;
+    width: 100%;
+    background: #fff;
+    padding: 15px 22px 20px;
+}
+
+.chat-footer .chat-form {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border-radius: 32px;
+    outline: 1px solid #CCCCE5;
+}
+.chat-footer .chat-form:focus-within {
+    outline: 2px solid #403cc6;
+}
+
+.chat-form .message-input {
+    border: none;
+    outline: none;
+    height: 47px;
+    width: 100%;
+    resize: none;
+    font-size: 0.9rem;
+    padding: 14px 0 13px 18px;
+    border-radius: inherit;
+}
+
+.chat-form .chat-controls {
+    display: flex;
+    height: 47px;
+    gap: 3px;
+    align-items: center;
+    align-self: flex-end;
+    padding-right: 6px;
+}
+
+.chat-form .chat-controls button {
+    height: 35px;
+    width: 35px;
+    border: none;
+    font-size: 1.15rem;
+    cursor: pointer;
+    color: #706DB0;
+    background: none;
+    border-radius: 50%;
+    transition: 0.2s ease;
+}
+
+.chat-form .chat-controls button:hover {
+    background: #f1f1ff;
+}
+
+.chat-form .chat-controls #send-message {
+    color: #fff;
+    background: #403cc6;
+    display: none;
+}
+.chat-form .message-input:valid~.chat-controls #send-message {
+    display: block;
+}
+.chat-form .chat-controls #send-message:hover {
+    color: #fff;
+    background: #242098;
 }
