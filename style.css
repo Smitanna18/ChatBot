@@ -184,6 +184,7 @@ body {
     background: #fff;
     border-radius: 32px;
     outline: 1px solid #CCCCE5;
+    position: relative;
 }
 .chat-footer .chat-form:focus-within {
     outline: 2px solid #403cc6;
@@ -266,4 +267,19 @@ body {
 .chat-form .file-upload-wrapper.file-uploaded img,
 .chat-form .file-upload-wrapper.file-uploaded:hover #file-cancel-btn {
     display: block;
+}
+
+em-emoji-picker {
+    position: absolute;
+    left: 50%;
+    width: 100%;
+    top: -355px;
+    max-width: 350px;
+    max-height: 350px;
+    transform: translateX(-50%);
+    visibility: hidden;
+}
+
+body.show-emoji-picker em-emoji-picker {
+    visibility: visible;
 }
