@@ -1,12 +1,19 @@
 const chatBody = document.querySelector(".chat-body");
 const messageInput = document.querySelector(".message-input");
 const sendMessageButton = document.querySelector("#send-message");
+const fileInput = document.querySelector("#file-input");
+const fileUploadWrapper = document.querySelector(".file-upload-wrapper");
+const fileCancelButton = document.querySelector("#file-cancel-btn");
 
 const API_KEY = "AIzaSyAxIinPPyesnrzAkAQDgsH8HrDI9s9RrBw";
 const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
 
 const userData = {
-    message: null
+    message: null,
+    file: {
+        data: null,
+        mime_type: null
+    }
 }
 
 const generateBotResponse = async (botMessageDiv) => {
@@ -22,7 +29,8 @@ const generateBotResponse = async (botMessageDiv) => {
             contents: [{
                 parts: [{
                     text: userData.message,
-                }]
+                }, ... userData.file.data? [{ inline_data: userData.file }] : []
+            ]
             }]
         })
     }
@@ -41,6 +49,7 @@ const generateBotResponse = async (botMessageDiv) => {
         messageTextElement.style.color = "#ff0000"
         console.log(error);
     } finally {
+        userData.file = {};
         botMessageDiv.classList.remove("thinking");
         chatBody.scrollTo({ top: chatBody.scrollHeight, behavior: "smooth" })
     }
@@ -57,7 +66,10 @@ const handleOutgoingMessage = (e) => {
     e.preventDefault();
     userData.message = messageInput.value.trim();
     messageInput.value = "";
-    const messageContent = `<div class="message-text"></div>`;
+    fileUploadWrapper.classList.remove("file-uploaded");
+
+    const messageContent = `<div class="message-text"></div>
+                            ${userData.file.data ? `<img src="data:${userData.file.mime_type}; base64, ${userData.file.data}" class="attachment" />` : "" }`;
 
     const userMessageDiv = createMessageBoxElement(messageContent, "user-message");
     userMessageDiv.querySelector(".message-text").innerText = userData.message
@@ -83,6 +95,7 @@ const handleOutgoingMessage = (e) => {
         chatBody.appendChild(botThinkingMessageDiv);
         chatBody.scrollTo({ top: chatBody.scrollHeight, behavior: "smooth" })
         generateBotResponse(botThinkingMessageDiv);
+        userData.file = {};
     }, 200);
 }
 
@@ -93,4 +106,30 @@ messageInput.addEventListener("keydown", (e) => {
     }
 });
 
+fileInput.addEventListener("change", () => {
+    const file = fileInput.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        fileUploadWrapper.querySelector("img").src = e.target.result;
+        fileUploadWrapper.classList.add("file-uploaded");
+        const base64String = e.target.result.split(",")[1];
+
+        userData.file = {
+            data: base64String,
+            mime_type: file.type
+        }
+        fileInput.value = "";
+    }
+    reader.readAsDataURL(file);
+})
+
+fileCancelButton.addEventListener("click", (e) => {
+    userData.file = {};
+    fileUploadWrapper.classList.remove("file-uploaded");
+})
+
 sendMessageButton.addEventListener("click", (e) => handleOutgoingMessage(e));
+
+document.querySelector("#file-upload-btn").addEventListener("click", () => fileInput.click())
