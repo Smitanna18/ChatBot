@@ -18,10 +18,15 @@ const userData = {
     }
 }
 
+const chatHistory = [];
 const initialInputHeight = messageInput.scrollHeight;
 
 const generateBotResponse = async (botMessageDiv) => {
     const messageTextElement = botMessageDiv.querySelector(".message-text");
+    chatHistory.push( {
+        role: "user", 
+        parts: [{ text: userData.message,}, ... userData.file.data? [{ inline_data: userData.file }] : [] ]
+    });
 
     const request = {
         method: "POST",
@@ -30,12 +35,7 @@ const generateBotResponse = async (botMessageDiv) => {
             "x-goog-api-key": API_KEY,
         },
         body: JSON.stringify({
-            contents: [{
-                parts: [{
-                    text: userData.message,
-                }, ... userData.file.data? [{ inline_data: userData.file }] : []
-            ]
-            }]
+            contents: chatHistory
         })
     }
 
@@ -48,6 +48,11 @@ const generateBotResponse = async (botMessageDiv) => {
         
         const apiResponseText = data.candidates[0].content.parts[0].text.replace(/\*\*(.*?)\*\*/g, "$1").trim();
         messageTextElement.innerText = apiResponseText;
+
+        chatHistory.push( {
+            role: "model",
+            parts: [{ text: apiResponseText }]
+        })
     } catch (error) {
         messageTextElement.innerText = "Sorry, some unknown error occured! I am unable to respond to your question at this moment.";
         messageTextElement.style.color = "#ff0000"
