@@ -9,16 +9,56 @@
 }
 
 body {
-    display: flex;
-    align-items: center;
-    justify-content: center;
     min-height: 100vh;
     background: linear-gradient(#EEEEFF, #C8C7FF);
 }
 
+/* ChatBot- TOGGLER */
+#chatbot-toggler {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    bottom: 30px;
+    right: 35px;
+    border: none;
+    height: 50px;
+    width: 50px;
+    cursor: pointer;
+    border-radius: 50%;
+    background: #403cc6;
+    transition: all 0.2s ease;
+}
+
+body.show-chatbot #chatbot-toggler {
+    transform: rotate(90deg);
+}
+
+#chatbot-toggler span {
+    color: #fff;
+    position: absolute;
+}
+
+body.show-chatbot .chatbot-popup {
+    opacity: 1;
+    pointer-events: auto;
+    transform: scale(1);
+}
+
+body.show-chatbot #chatbot-toggler span:first-child,
+#chatbot-toggler span:last-child {
+    opacity: 0;
+}
+
+body.show-chatbot #chatbot-toggler span:last-child {
+    opacity: 1;
+}
+
 /* ChatBot - HEADER */
 .chatbot-popup {
-    position: relative;
+    position: fixed;
+    right: 35px;
+    bottom: 90px;
     width: 420px;
     background: #fff;
     overflow: hidden;
@@ -26,7 +66,12 @@ body {
     box-shadow: 0 0 128px 0 rgba(0, 0, 0, 0.1),
         0 32px 64px -48px rgba(0, 0, 0, 0.5);
     scrollbar-width: thin;
-    scrollbar-color: #8a87e7 transparent;
+    scrollbar-color: #bdbcee transparent;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.1s ease;
+    transform: scale(0.2);
+    transform-origin: bottom right;
 }
 
 .chat-header {
@@ -163,6 +208,12 @@ body {
     }
 }
 
+.chat-body .user-message .attachment {
+    width: 50%;
+    margin-top: -7px;
+    border-radius: 13px 3px 13px 13px;
+}
+
 /* ChatBot - FOOTER */
 .chat-footer {
     position: absolute;
@@ -178,6 +229,7 @@ body {
     background: #fff;
     border-radius: 32px;
     outline: 1px solid #CCCCE5;
+    position: relative;
 }
 .chat-footer .chat-form:focus-within {
     outline: 2px solid #403cc6;
@@ -192,6 +244,12 @@ body {
     font-size: 0.9rem;
     padding: 14px 0 13px 18px;
     border-radius: inherit;
+    max-height: 180px;
+    white-space: pre-line;
+    scrollbar-color: transparent transparent;
+}
+.chat-form .message-input:hover {
+    scrollbar-color: #bdbcee transparent;
 }
 
 .chat-form .chat-controls {
@@ -230,4 +288,83 @@ body {
 .chat-form .chat-controls #send-message:hover {
     color: #fff;
     background: #242098;
+}
+
+.chat-form .file-upload-wrapper {
+    height: 35px;
+    width: 35px;
+    position: relative;
+}
+.chat-form .file-upload-wrapper :where(img, button) {
+    position: absolute;
+}
+.chat-form .file-upload-wrapper img{
+    height: 100%;
+    width: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    display: none;
+}
+.chat-form .file-upload-wrapper #file-cancel-btn {
+    color: #ff0000;
+    background: #fff;
+    opacity: 0.7;
+}
+
+.chat-form .file-upload-wrapper :where(img, #file-cancel-btn),
+.chat-form .file-upload-wrapper.file-uploaded #file-upload-btn {
+    display: none;
+}
+.chat-form .file-upload-wrapper.file-uploaded img,
+.chat-form .file-upload-wrapper.file-uploaded:hover #file-cancel-btn {
+    display: block;
+}
+
+em-emoji-picker {
+    position: absolute;
+    left: 50%;
+    width: 100%;
+    top: -355px;
+    max-width: 350px;
+    max-height: 350px;
+    transform: translateX(-50%);
+    visibility: hidden;
+}
+
+body.show-emoji-picker em-emoji-picker {
+    visibility: visible;
+}
+
+/* RESPONSIVE media query for mobile screens */
+
+@media (max-width: 520px) {
+    #chatbot-toggler {
+        right: 20px;
+        bottom: 20px;
+    }
+
+    .chatbot-popup {
+        right: 0;
+        bottom: 0;
+        height: 100%;
+        width: 100%;
+        border-radius: 0;
+    }
+
+    .chatbot-popup .chat-header {
+        padding: 12px 15px;
+    }
+
+    .chat-body {
+        height: calc(90% - 55px);
+        padding: 25px 15px;
+    }
+
+    .chat-footer {
+        padding: 10px 15px 15px;
+    }
+
+    .chat-form .file-upload-wrapper.file-uploaded #file-cancel-btn {
+        opacity: 0;
+    }
 }
